@@ -1,0 +1,305 @@
+/* ============================================================
+   Felinora — liquid glass
+   Arkada çalan şarkının kapağı bulanık durur; paneller onun üstünde buzlu cam.
+   Renkler color.ini'deki şemadan gelir.
+   ============================================================ */
+
+:root {
+    --fl-r: 22px;
+    --fl-gap: 10px;
+    --fl-grad: linear-gradient(90deg, var(--spice-button), var(--spice-accent2));
+    /* cam: yarı saydam dolgu + bulanıklık + üst kenarda ışık */
+    --fl-glass-fill: rgba(var(--spice-rgb-main), 0.38);
+    --fl-glass-blur: blur(26px) saturate(170%);
+    --fl-glass-edge: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 0 1px rgba(255,255,255,0.07),
+                     inset 0 -1px 0 rgba(0,0,0,0.25), 0 18px 40px -22px rgba(0,0,0,0.9);
+}
+
+/* ---------- arka plan: kapak (theme.js) + koyu tema tonu ---------- */
+body, .Root, .Root > div:first-child { background: var(--spice-sidebar) !important; }
+#fl-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+#fl-bg::after {      /* tema rengiyle karart: yazılar her kapakta okunsun */
+    content: ""; position: absolute; inset: 0;
+    background:
+        radial-gradient(1200px 800px at 15% 10%, rgba(var(--spice-rgb-button), 0.18), transparent 60%),
+        radial-gradient(1000px 900px at 90% 100%, rgba(var(--spice-rgb-accent2), 0.20), transparent 60%),
+        rgba(var(--spice-rgb-sidebar), 0.62);
+}
+.fl-bg-layer {
+    position: absolute; inset: -12%;
+    background-size: cover; background-position: center;
+    filter: blur(70px) saturate(1.6) brightness(0.9);
+    opacity: 0; transition: opacity 1.2s ease;
+}
+/* kapak sabit durur: yavaşça kayması her karede tam pencere bulanıklığını yeniden hesaplatıp
+   Spotify'ı boşta bile ~%120 işlemciye çıkarıyordu */
+.fl-bg-layer.on { opacity: 1; transform: scale(1.08); }
+.Root { position: relative; z-index: 1; background: transparent !important; }
+.Root > div:first-child { background: transparent !important; gap: var(--fl-gap) !important; padding: var(--fl-gap) !important; }
+
+/* ---------- cam paneller ---------- */
+#Desktop_LeftSidebar_Id, #main-view, .Root > div > div:has(> [class*="Root__right-sidebar"]), .Root > div > div:has(> aside[data-testid="now-playing-bar"]) {
+    /* canlı arka bulanıklık (backdrop-filter) yok: arkadaki kapak zaten bulanık, ve 3D kayan satırlarla
+       birlikte her karede yeniden hesaplanıp kaydırmayı saniyede ~20 kareye düşürüyordu */
+    background: var(--fl-glass-fill) !important;
+    border-radius: var(--fl-r) !important;
+    box-shadow: var(--fl-glass-edge) !important;
+    position: relative; overflow: hidden;
+}
+/* camın üstünde çapraz ışık yansıması */
+#Desktop_LeftSidebar_Id::after, #main-view::after, .Root > div > div:has(> [class*="Root__right-sidebar"])::after, .Root > div > div:has(> aside[data-testid="now-playing-bar"])::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit; z-index: 5;
+    background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 22%, transparent 45%,
+                                transparent 75%, rgba(255,255,255,0.04) 100%);
+}
+/* panellerin içindeki düz renkli yüzeyler saydam olsun (cam görünsün) */
+#Desktop_LeftSidebar_Id, #main-view, .Root > div > div:has(> [class*="Root__right-sidebar"]), .Root > div > div:has(> aside[data-testid="now-playing-bar"]) {
+    --background-base: transparent !important;
+    --background-highlight: rgba(255,255,255,0.07) !important;
+    --background-press: rgba(255,255,255,0.04) !important;
+    --background-elevated-base: rgba(255,255,255,0.06) !important;
+    --background-elevated-highlight: rgba(255,255,255,0.10) !important;
+    --background-tinted-base: rgba(255,255,255,0.08) !important;
+    --background-tinted-highlight: rgba(255,255,255,0.13) !important;
+}
+.main-yourLibraryX-entryPoints, .main-yourLibraryX-libraryContainer, .Root > div > div:has(> [class*="Root__right-sidebar"]) > *,
+.Root > div > div:has(> [class*="Root__right-sidebar"]) aside, .Root > div > div:has(> [class*="Root__right-sidebar"]) section, #Desktop_LeftSidebar_Id section,
+.main-nowPlayingBar-nowPlayingBar, .Root > div > div:has(> aside[data-testid="now-playing-bar"]) footer {
+    background: transparent !important;
+}
+/* sağ paneldeki kartlar (şarkı sözü, sanatçı) da küçük cam kutular */
+.Root > div > div:has(> [class*="Root__right-sidebar"]) [class*="Card"], .Root > div > div:has(> [class*="Root__right-sidebar"]) [data-testid*="card"] {
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), inset 0 0 0 1px rgba(255,255,255,0.06) !important;
+}
+/* ana sayfa / çalma listesi üst renk gradyanı: camın içinde yumuşasın */
+/* üstte yapışık duran başlıklar: altından geçen satırlar okunmasın diye buzlu cam */
+.main-trackList-trackListHeader {
+    background: rgba(var(--spice-rgb-main), 0.94) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+    z-index: 10 !important;
+}
+.main-topBar-container { z-index: 11 !important; }
+.main-entityHeader-backgroundColor, .main-actionBarBackground-background {
+    background: linear-gradient(180deg, rgba(var(--spice-rgb-button), 0.22), transparent) !important;
+}
+.main-entityHeader-overlay, .main-actionBarBackground-background + div { background: transparent !important; }
+
+/* ---------- üst çubuk + arama: cam hapçık ---------- */
+#global-nav-bar { background: transparent !important; }
+#global-nav-bar input, [data-testid="search-input"] {
+    border-radius: 999px !important;
+    background: rgba(255,255,255,0.07) !important;
+    -webkit-backdrop-filter: var(--fl-glass-blur); backdrop-filter: var(--fl-glass-blur);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), inset 0 0 0 1px rgba(255,255,255,0.08) !important;
+}
+#global-nav-bar input:focus { box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), inset 0 0 0 1.5px var(--spice-button) !important; }
+#global-nav-bar button[aria-label] > span, #global-nav-bar a[aria-label] {
+    border-radius: 999px !important;
+}
+
+/* ---------- filtre etiketleri: cam hapçık, seçili olan renkli ---------- */
+.main-yourLibraryX-filterArea button > span, .search-searchCategory-SearchCategory button > span,
+#main-view [role="listbox"] button > span, #main-view .encore-text-body-small-bold + span {
+    border-radius: 999px !important;
+}
+.main-yourLibraryX-filterArea button[aria-checked="true"] > span,
+.search-searchCategory-SearchCategory button[aria-checked="true"] > span {
+    background: var(--fl-grad) !important; color: var(--spice-sidebar) !important;
+}
+
+/* ---------- kitaplık ve şarkı listesi ---------- */
+.main-yourLibraryX-listItem, .main-yourLibraryX-rowCover, [role="row"] { border-radius: 14px !important; }
+.main-trackList-trackListRow { border-radius: 12px !important; transition: background-color .15s; }
+.main-trackList-trackListRow:hover { background-color: rgba(255,255,255,0.07) !important; }
+.main-trackList-trackListRow[aria-selected="true"] { background-color: rgba(var(--spice-rgb-button), 0.16) !important; }
+.main-trackList-trackListRow:has(img[src*="equaliser"]) {
+    background: linear-gradient(90deg, rgba(var(--spice-rgb-button), 0.16), transparent 70%) !important;
+    box-shadow: inset 3px 0 0 var(--spice-button);
+}
+.main-trackList-trackListHeader { border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+.main-trackList-rowImage, .main-trackList-rowImage img { border-radius: 8px !important; }
+
+/* yeşil ekolayzır → tema rengi */
+img[src*="equaliser-animated"] {
+    object-position: -9999px 0;
+    background: var(--spice-button);
+    -webkit-mask: url("images/equaliser-animated-white.gif") center / contain no-repeat;
+}
+
+/* ---------- kartlar ---------- */
+.main-card-card {
+    border-radius: 18px !important;
+    background: rgba(255,255,255,0.045) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px rgba(255,255,255,0.05);
+    transition: transform .25s cubic-bezier(.2,.9,.3,1.3), background .25s, box-shadow .25s;
+}
+.main-card-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.09) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), inset 0 0 0 1px rgba(var(--spice-rgb-button), 0.35),
+                0 14px 30px -14px rgba(var(--spice-rgb-button), 0.6);
+}
+.main-card-imageContainer img, .main-cardImage-image, .main-image-image { border-radius: 14px !important; }
+
+/* oynat düğmeleri: renkli cam damla */
+.main-playButton-PlayButton > span, .main-playButton-button > span,
+button[data-testid="play-button"] > span, .encore-bright-accent-set {
+    background: var(--fl-grad) !important;
+    color: var(--spice-sidebar) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -2px 4px rgba(0,0,0,0.2),
+                0 8px 20px -6px rgba(var(--spice-rgb-button), 0.85) !important;
+}
+
+/* ---------- alt çalma çubuğu ---------- */
+.Root > div > div:has(> aside[data-testid="now-playing-bar"]) { margin: 0 var(--fl-gap) var(--fl-gap) !important; }
+.main-nowPlayingWidget-coverArt, .main-nowPlayingWidget-coverArt img,
+.main-nowPlayingWidget-coverArtContainer { border-radius: 12px !important; }
+.main-nowPlayingWidget-coverArt { transition: box-shadow .5s; }
+.fl-playing .main-nowPlayingWidget-coverArt {
+    box-shadow: 0 0 0 1.5px rgba(255,255,255,0.25), 0 0 24px -2px rgba(var(--spice-rgb-button), 0.7);
+}
+.fl-pulse .main-nowPlayingWidget-coverArt { animation: fl-pulse .7s ease-out; }
+@keyframes fl-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(var(--spice-rgb-button), 0.9); }
+    100% { box-shadow: 0 0 0 14px rgba(var(--spice-rgb-button), 0); }
+}
+button[data-testid="control-button-playpause"] {
+    background: var(--fl-grad) !important;
+    color: var(--spice-sidebar) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 4px 16px -4px rgba(var(--spice-rgb-button), 0.9);
+    transition: transform .15s;
+}
+button[data-testid="control-button-playpause"]:hover { transform: scale(1.08); }
+button[data-testid="control-button-playpause"] * { background: transparent !important; }
+button[data-testid="control-button-playpause"] svg { fill: var(--spice-sidebar) !important; color: var(--spice-sidebar) !important; }
+
+/* ilerleme ve ses çubukları: cam oluk + renkli dolgu */
+.x-progressBar-progressBarBg, .progress-bar__bg {
+    --bg-color: rgba(255,255,255,0.13) !important;
+    height: 5px !important; border-radius: 999px !important;
+}
+.x-progressBar-fillColor, .progress-bar__fg { background: var(--fl-grad) !important; border-radius: 999px !important; }
+.playback-bar .x-progressBar-fillColor { box-shadow: 0 0 10px rgba(var(--spice-rgb-button), 0.7); }
+.progress-bar__slider {
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(var(--spice-rgb-button), 0.55), 0 2px 6px rgba(0,0,0,0.4) !important;
+}
+
+/* ---------- menüler, ipuçları, pencereler: cam ---------- */
+.main-contextMenu-menu, [data-tippy-root] > div, .GenericModal, .main-trackCreditsModal-container {
+    border-radius: 16px !important;
+    background: rgba(var(--spice-rgb-card), 0.62) !important;
+    -webkit-backdrop-filter: var(--fl-glass-blur); backdrop-filter: var(--fl-glass-blur);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 0 1px rgba(255,255,255,0.08), 0 20px 50px -12px #000 !important;
+}
+.main-contextMenu-menuItemButton { border-radius: 10px !important; }
+.main-contextMenu-menuItemButton:hover { background: rgba(255,255,255,0.09) !important; }
+
+/* ---------- kaydırma çubuğu ---------- */
+::-webkit-scrollbar { width: 8px !important; height: 8px !important; }
+::-webkit-scrollbar-thumb, .os-scrollbar-handle { background: rgba(255,255,255,0.18) !important; border-radius: 999px !important; }
+::-webkit-scrollbar-thumb:hover { background: var(--spice-button) !important; }
+::selection { background: rgba(var(--spice-rgb-button), 0.35); }
+
+/* sayfa başlıklarının renk blokları (ana sayfa gri, çalma listeleri kapak rengi):
+   keskin kenar yerine aşağı doğru camın içinde erisin */
+#main-view [style^="background-color: rgb"]:not(:has(img)) {
+    opacity: 0.55;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+}
+/* kaydırmalı satırların kenarındaki koyu gölgeler camda kir gibi duruyordu */
+.search-searchCategory-contentArea::before, .search-searchCategory-contentArea::after { display: none !important; }
+
+/* ============================================================
+   çark (rolling) etkisi — saf CSS, kaydırmaya bağlı animasyon
+   Satır listenin altından girerken geriye yatık ve küçük, ortada dik ve önde,
+   üstten çıkarken öbür yöne yatık. Ortadayken seçilmiş gibi cam karta döner.
+   ============================================================ */
+#main-view .main-trackList-trackListRow {
+    transform-origin: 50% 50%;
+    position: relative;
+    animation: fl-roll linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
+}
+/* yalnızca transform + opacity canlandırılır: ekran kartında, kaydırmayla aynı karede çizilir */
+@keyframes fl-roll {
+    0%   { transform: perspective(1100px) rotateX(-24deg) scale(0.9);  opacity: 0.35; }
+    40%  { transform: perspective(1100px) rotateX(-4deg)  scale(0.99); opacity: 0.92; }
+    50%  { transform: perspective(1100px) rotateX(0deg)   scale(1.03); opacity: 1; }
+    60%  { transform: perspective(1100px) rotateX(4deg)   scale(0.99); opacity: 0.92; }
+    100% { transform: perspective(1100px) rotateX(24deg)  scale(0.9);  opacity: 0.35; }
+}
+/* ortadaki satırın cam kartı: hazır çizilmiş bir katman, sadece saydamlığı değişir */
+#main-view .main-trackList-trackListRow::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    /* dış gölge yok: 30 satırın her birinde bulanık gölge çizmek kaydırmayı yarı yarıya yavaşlatıyordu */
+    background: linear-gradient(90deg, rgba(var(--spice-rgb-button), 0.24), rgba(var(--spice-rgb-accent2), 0.12));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), inset 0 0 0 1px rgba(var(--spice-rgb-button), 0.4);
+    opacity: 0;
+    will-change: opacity;
+    animation: fl-glow linear both;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
+}
+@keyframes fl-glow {
+    0%, 44% { opacity: 0; }
+    50%     { opacity: 1; }
+    56%, 100% { opacity: 0; }
+}
+
+/* şarkı sözleri: aynı çark, satırlar biraz daha çok yatar ve kenarda bulanıklaşır */
+[style*="--lyrics-color-active"]:not([class*="Root__right-sidebar"] *) div[dir="auto"] {
+    transform-origin: 50% 50%;
+    animation: fl-roll-lyric linear both;
+    will-change: transform;
+    animation-timeline: view();
+    animation-range: cover 0% cover 100%;
+}
+@keyframes fl-roll-lyric {
+    0%   { transform: perspective(900px) rotateX(-34deg) scale(0.84); filter: blur(2.5px); }
+    42%  { transform: perspective(900px) rotateX(-4deg)  scale(0.98); filter: blur(0); }
+    58%  { transform: perspective(900px) rotateX(4deg)   scale(0.98); filter: blur(0); }
+    100% { transform: perspective(900px) rotateX(34deg)  scale(0.84); filter: blur(2.5px); }
+}
+
+/* ============================================================
+   şarkı sözleri: camın üstünde, ortalanmış, çalan satır parlak
+   ============================================================ */
+[style*="--lyrics-color-active"]:not([class*="Root__right-sidebar"] *) {
+    --lyrics-color-background: transparent !important;
+    /* tam pencere söz katmanı arkasındaki uygulamayı buzlu camla örtsün */
+    background-color: rgba(var(--spice-rgb-sidebar), 0.55) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(170%); backdrop-filter: blur(40px) saturate(170%);
+    --lyrics-color-active: var(--spice-text) !important;
+    --lyrics-color-inactive: rgba(var(--spice-rgb-text), 0.38) !important;
+    --lyrics-color-passed: rgba(var(--spice-rgb-text), 0.55) !important;
+    --lyrics-color-messaging: var(--spice-subtext) !important;
+}
+[style*="--lyrics-color-active"]:not([class*="Root__right-sidebar"] *) div[dir="auto"] {
+    text-align: center;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em;
+    padding: 6px 0;
+    transition: color .35s, text-shadow .35s;
+}
+[style*="--lyrics-color-active"]:not([class*="Root__right-sidebar"] *) div[dir="auto"] > div { text-align: center; }
+/* çalan satır: tema gradyanıyla boyanmış yazı + parıltı */
+div[dir="auto"].fl-lyric-active > div {
+    background: linear-gradient(90deg, var(--spice-accent-soft), var(--spice-button) 45%, var(--spice-accent2));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent !important;
+    filter: drop-shadow(0 0 18px rgba(var(--spice-rgb-button), 0.55));
+}
+/* sağ paneldeki söz önizleme kutusu: Spotify'ın düz rengi yerine cam */
+.Root > div > div:has(> [class*="Root__right-sidebar"]) [style*="--lyrics-color-background"], .Root > div > div:has(> [class*="Root__right-sidebar"]) [style*="--lyrics-color-active"] {
+    --lyrics-color-background: rgba(var(--spice-rgb-button), 0.14) !important;
+    --lyrics-color-active: var(--spice-text) !important;
+    --lyrics-color-inactive: rgba(var(--spice-rgb-text), 0.45) !important;
+    background: linear-gradient(160deg, rgba(var(--spice-rgb-button), 0.22), rgba(var(--spice-rgb-accent2), 0.10)) !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 0 0 1px rgba(255,255,255,0.07) !important;
+}

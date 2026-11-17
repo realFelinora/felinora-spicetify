@@ -1,0 +1,13 @@
+[
+    {
+        "name": "Felinora",
+        "description": "Dark liquid-glass theme: the playing song's blurred cover behind frosted glass panels, rolling track list, glowing lyrics. 8 color schemes.",
+        "preview": "screenshots/preview.jpg",
+        "readme": "README.md",
+        "usercss": "Felinora/user.css",
+        "schemes": "Felinora/color.ini",
+        "include": ["https://raw.githubusercontent.com/realFelinora/felinora-spicetify/main/Felinora/theme.js"],
+        "authors": [{ "name": "realFelinora", "url": "https://github.com/realFelinora" }],
+        "tags": ["dark", "glass", "blur", "lyrics"]
+    }
+]
